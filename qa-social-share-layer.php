@@ -10,9 +10,14 @@
             parent::head_metas();
 
             if ( qa_opt( qa_sss_opt::ENABLE_OPEN_GRAPH_SUPPORT ) && $this->template != 'admin' ) {
+                $images = array();
+
                 if ( in_array( $this->template, array( 'question', 'blog' ) ) ) {
                     $content = @$this->content['q_view']['raw']['content'];
-                    $image_url = ami_social_get_first_image_from_html( $content );
+                    if (!empty($this->content['q_view']['images']))
+                        $images = $this->content['q_view']['images'];
+
+                    $image_url = ami_social_get_first_image_from_html( $content, $images );
                     $description = @$this->content['description'];
                 } else if ( $this->template == 'user' ) {
                     $image_html = @$this->content['form_profile']['fields']['avatar']['html'];
@@ -44,15 +49,14 @@
                 $ogp = new OpenGraphProtocol();
                 $ogp->setLocale( $locale );
                 $ogp->setSiteName( qa_opt( 'site_title' ) );
-                
+
                 if ( isset($this->content['title']) ) {
                     $ogp->setTitle( strip_tags( $this->content['title'] ) );
                 }
-                
+
                 $ogp->setDescription( strip_tags( $description ) );
                 $ogp->setType( 'website' );
                 $ogp->setURL( qa_path_absolute( qa_request() ) );
-                $ogp->setDeterminer( 'the' );
 
                 if ( $this->template == 'user' ) {
                     $ogp->setType( 'profile' );
@@ -61,7 +65,7 @@
                     $profile->setUsername( $username );
 
                     $ogp_html_arr = explode( PHP_EOL, $profile->toHTML() );
-                    
+
                     if(count($ogp_html_arr)) {
                         foreach ($ogp_html_arr as $key => $ogp_html) {
                             $this->output_raw( $ogp_html );
@@ -84,13 +88,13 @@
                 }
 
                 $ogp_html_arr = explode( PHP_EOL, $ogp->toHTML() );
-                
+
                 if(count($ogp_html_arr)) {
                     foreach ($ogp_html_arr as $key => $ogp_html) {
                         $this->output_raw( $ogp_html );
                     }
                 }
-                
+
                 $facebook_app_id = qa_opt( qa_sss_opt::FACEBOOK_APP_ID );
 
                 if ( !empty( $facebook_app_id ) ) {
@@ -100,7 +104,7 @@
                 $twitter_username = trim( qa_opt( qa_sss_opt::TWITTER_HANDLE ) );
 
                 if ( !empty( $twitter_username ) ) {
-                    
+
                     if ( strpos( $twitter_username, '@' ) !== 0 )
                         $twitter_username = '@' . $twitter_username;
 
@@ -161,7 +165,7 @@
                 $social_share->generateShareButtons();
                 $this->output( '</div>' );
             }
-            
+
             parent::q_view_buttons( $q_view );
         }
 

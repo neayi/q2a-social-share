@@ -74,12 +74,21 @@
      *
      * @return null
      */
-    function ami_social_get_first_image_from_html( $string )
+    function ami_social_get_first_image_from_html( $string, $images = array() )
     {
-        $regex = "/\<img.+src\s*=\s*\"([^\"]*)\"[^\>]*\>/Us";
-        if ( $image = preg_match_all( $regex, $string, $matches ) ) {
-            return $matches[1][0];
-        } else {
-            return null;
+        if (!empty($images))
+        {
+            // we use the images as provided by q2a_ajax_images
+            $openGraphImage = reset($images);
+            return qa_get_blob_url($openGraphImage['blobId'], true) . '&filename=' . $openGraphImage['filename'];
+        }
+        else
+        {
+            $regex = "/\<img.+src\s*=\s*\"([^\"]*)\"[^\>]*\>/Us";
+            if ( $image = preg_match_all( $regex, $string, $matches ) ) {
+                return $matches[1][0];
+            } else {
+                return null;
+            }
         }
     }

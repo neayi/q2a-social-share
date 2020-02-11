@@ -51,7 +51,7 @@
 
         function admin_form()
         {
-            //require_once QA_INCLUDE_DIR.'qa-util-sort.php';
+            //require_once QA_INCLUDE_DIR.'util/sort.php';
 
             $saved = false;
 
